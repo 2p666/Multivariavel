@@ -81,3 +81,62 @@ body {
     opacity: 0.5;
 }
 
+/* Container Principal do Segredo (Garante que tudo fique centralizado) */
+.segredo-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    padding: 100px; /* Dá espaço para os elementos artísticos */
+}
+
+/* Área de Texto Artístico (Para sobreposição controlada) */
+.shadow-realm {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centraliza na tela */
+    z-index: 5;
+    pointer-events: none; /* Não atrapalha o clique */
+}
+
+.shadow-text {
+    position: absolute;
+    color: rgba(255, 183, 197, 0.4); /* Rosa suave e transparente (gótico moderno) */
+    font-size: 1.5rem;
+    font-weight: bold;
+    transform: rotate(-10deg); /* Inclinação artística */
+    filter: blur(2px); /* Efeito de sombra/misterio */
+}
+
+.mystery-phrase {
+    position: absolute;
+    bottom: -30px; /* Ajusta a distância do texto acima */
+    left: 0;
+    color: rgba(161, 18, 40, 0.5); /* Vermelho gótico suave */
+    font-size: 1.1rem;
+    white-space: nowrap; /* Impede que quebre linha */
+}
+
+/* Título e Subtítulo Principais (Seguem o fluxo normal) */
+h1.digitar {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 20px;
+}
+
+.fade-in-text {
+    position: relative;
+    z-index: 10;
+}
+
+/* Garante que o símbolo gótico não sobreponha nada */
+.symbol {
+    position: relative;
+    z-index: 10;
+    margin-top: 50px;
+}
+
