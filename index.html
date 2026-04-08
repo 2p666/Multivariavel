@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Acesso</title>
 
+<link rel="icon" type="img/png" href="img/p.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel&display=swap" rel="stylesheet">
 
 <style>
@@ -140,19 +142,19 @@ function entrar() {
     const msg = document.getElementById("mensagem");
     const box = document.querySelector('.login-box');
 
-    // Limpa a animação de erro anterior
     box.classList.remove('shake');
 
     if (senha === "goth") {
+        // Redireciona para a página principal
         window.location.href = "portal.html";
     } 
     else if (senha === "hellokitty" || senha === "hello") { 
         window.location.href = "https://void2p.github.io/Portal/";
     }
-    if (senha === "primeiro") {
+    else if (senha === "primeiro") {
         window.location.href = "Burton.html";
     } 
-    if (senha === "6 meses") {
+    else if (senha === "amo você") { // Ajustado para evitar conflito com a senha 'goth'
         window.location.href = "Amo você.html";
     } 
     else if (senha === "nenem") {
