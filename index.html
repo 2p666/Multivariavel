@@ -6,10 +6,21 @@
 <title>Acesso</title>
 
 <link rel="icon" type="img/png" href="img/p.png">
-
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel&display=swap" rel="stylesheet">
 
 <style>
+/* FILTRO DE RUÍDO / GRÃO */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png');
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 1000;
+}
+
 body {
     margin: 0;
     height: 100vh;
@@ -21,178 +32,297 @@ body {
     font-family: 'IM Fell English SC', serif;
     overflow: hidden;
     background-color: black;
+    transition: background 2s ease;
 }
 
+/* ESTRELAS DE FUNDO */
 .star {
     position: absolute;
-    width: 2px;
-    height: 2px;
-    background: #a11228;
+    width: 2px; height: 2px;
     border-radius: 50%;
-    box-shadow: 0 0 8px #a11228;
-    animation: blink 2s infinite alternate;
     pointer-events: none;
+    animation: moveStar linear infinite, twinkle 1.5s ease-in-out infinite alternate;
 }
 
-@keyframes blink {
-    from { opacity: 0.2; }
-    to { opacity: 0.8; }
+@keyframes moveStar {
+    from { transform: translateY(105vh); }
+    to { transform: translateY(-5vh); }
 }
 
+@keyframes twinkle {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* CAIXA DE LOGIN */
 .login-box {
     width: 320px;
     padding: 40px;
-    border: 2px solid #7a1e2d;
-    border-radius: 20px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     text-align: center;
     color: #ffb3c6;
     z-index: 10;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 input {
-    width: 80%;
-    padding: 10px;
+    width: 85%;
+    padding: 12px;
     margin-top: 20px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid #a11228;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #7a1e2d;
+    border-radius: 8px;
     color: #ffb3c6;
     text-align: center;
     outline: none;
+    transition: 0.3s;
 }
 
 button {
-    margin-top: 20px;
-    padding: 10px 20px;
+    margin-top: 25px;
+    padding: 10px 25px;
     background: transparent;
     border: 1px solid #a11228;
     color: #a11228;
     cursor: pointer;
     font-family: 'Cinzel', serif;
+    border-radius: 20px;
     transition: 0.3s;
 }
 
-button:hover {
-    background: #a11228;
+button:hover { background: #a11228; color: black; box-shadow: 0 0 15px #a11228; }
+
+#mensagem { margin-top: 15px; font-weight: bold; min-height: 20px; transition: color 0.3s; }
+
+/* ESTADOS DE COR DINÂMICA */
+.state-gogh { border-color: #f1c40f !important; box-shadow: 0 0 40px rgba(241, 196, 15, 0.6) !important; color: #f1c40f !important; }
+.state-goth { border-color: #ffffff !important; box-shadow: 0 0 40px rgba(255, 255, 255, 0.6) !important; color: #fff !important; }
+.state-hello { border-color: #ffc9da !important; box-shadow: 0 0 40px rgba(255, 201, 218, 0.6) !important; color: #ffc9da !important; }
+
+/* TRANSIÇÕES */
+.transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2000; overflow: hidden; }
+
+/* Morcegos Ajustados */
+.bat {
+    position: absolute;
+    font-size: 80px; /* Bem maiores */
     color: black;
-    box-shadow: 0 0 15px #a11228;
+    filter: drop-shadow(0 0 15px rgba(0,0,0,0.9));
+    z-index: 2001;
 }
 
-#mensagem {
-    margin-top: 15px;
-    color: #ff0040;
-    font-weight: bold;
-    min-height: 20px;
+/* Animação de Voo Aleatório */
+@keyframes flyAcross {
+    0% { transform: translate(var(--startX), var(--startY)) scale(0.5) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translate(var(--endX), var(--endY)) scale(2.5) rotate(var(--rot)); opacity: 0; }
 }
 
-.shake { 
-    animation: shake 0.5s; 
-    border-color: #ff0000 !important; 
-    box-shadow: 0 0 40px #ff0000 !important;
+/* Estrelas Gogh Giratórias */
+.gogh-star {
+    position: absolute;
+    font-size: 60px;
+    color: #f1c40f;
+    filter: drop-shadow(0 0 20px #f1c40f);
+    animation: spinStar 2.5s forwards ease-in;
 }
+
+@keyframes spinStar {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    100% { transform: scale(10) rotate(1440deg); opacity: 0; }
+}
+
+/* Explosão Rosa Robusta */
+.kitty-pop {
+    position: absolute;
+    background: radial-gradient(circle, #ffc9da 10%, #ff85a2 70%, transparent 100%);
+    border-radius: 50%;
+    filter: blur(10px);
+    animation: explodePink 2.5s forwards cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+@keyframes explodePink {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(50); opacity: 0; }
+}
+
+.exit-portal { opacity: 0 !important; transform: scale(0.5) !important; pointer-events: none; }
+.shake { animation: shake 0.5s; border-color: #ff0000 !important; }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-12px); }
-    40% { transform: translateX(12px); }
-    60% { transform: translateX(-8px); }
-    80% { transform: translateX(8px); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-7px); }
+    80% { transform: translateX(7px); }
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="login-box">
+<div class="login-box" id="loginBox">
     <h2 style="font-family: 'Pirata One', cursive; font-size: 2.5rem; margin-bottom: 0;">Nosso Portal</h2>
-    <p>Somente nós dois.</p>
+    <p style="opacity: 0.7;">Somente nós dois.</p>
 
-    <input type="password" id="senha" placeholder="Senha">
+    <input type="password" id="senha" placeholder="Senha" autocomplete="off">
     <br>
-    <button onclick="entrar()">Entrar</button>
+    <button onclick="entrar()" id="btnEntrar">Entrar</button>
 
     <p id="mensagem"></p>
 </div>
 
 <script>
-/* estrelas */
-for(let i=0;i<60;i++){ 
-    let star=document.createElement("div");
-    star.className="star";
-    star.style.top=Math.random()*100+"%";
-    star.style.left=Math.random()*100+"%";
-    star.style.animationDuration=(Math.random()*3+1)+"s";
+/* ESTRELAS DE FUNDO */
+for(let i=0; i<80; i++){ 
+    let star = document.createElement("div");
+    star.className = "star";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top = Math.random() * 100 + "vh";
+    const color = Math.random() > 0.5 ? "#a11228" : "#0080ff";
+    star.style.background = color;
+    star.style.animationDuration = (Math.random() * 8 + 5) + "s";
+    star.style.animationDelay = (Math.random() * 5) + "s";
     document.body.appendChild(star);
 }
 
 const inputSenha = document.getElementById("senha");
+const box = document.getElementById("loginBox");
+let erros = 0;
 
-inputSenha.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        entrar();
-    }
+/* FEEDBACK DINÂMICO AO DIGITAR */
+inputSenha.addEventListener("input", (e) => {
+    const val = e.target.value.toLowerCase().trim();
+    box.classList.remove('state-gogh', 'state-goth', 'state-hello');
+    if(val.includes("gogh")) box.classList.add('state-gogh');
+    else if(val.includes("goth")) box.classList.add('state-goth');
+    else if(val.includes("hello") || val.includes("kitty")) box.classList.add('state-hello');
 });
 
+/* MOUSE TILT */
+document.addEventListener('mousemove', (e) => {
+    if(box.classList.contains('exit-portal')) return;
+    const x = e.clientX, y = e.clientY;
+    const rect = box.getBoundingClientRect();
+    const rotateX = ( (rect.top + rect.height/2) - y) / 25;
+    const rotateY = (x - (rect.left + rect.width/2)) / 25;
+    box.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+});
+
+inputSenha.addEventListener("keypress", (e) => { if(e.key === "Enter") entrar(); });
+
+/* FUNÇÕES DE TRANSIÇÃO */
+function triggerSpecialTransition(type, callback) {
+    const container = document.createElement('div');
+    container.className = 'transition-overlay';
+    document.body.appendChild(container);
+
+    if (type === 'bat') {
+        for(let i=0; i<35; i++) { // Mais morcegos
+            setTimeout(() => {
+                const bat = document.createElement('div');
+                bat.className = 'bat';
+                bat.innerHTML = '🕷️🕸️🖤';
+                
+                // Posições aleatórias de início e fim
+                const startX = Math.random() * 120 - 20 + "vw";
+                const startY = "110vh";
+                const endX = Math.random() * 120 - 20 + "vw";
+                const endY = "-20vh";
+                const rot = Math.random() * 90 - 45 + "deg";
+
+                bat.style.setProperty('--startX', startX);
+                bat.style.setProperty('--startY', startY);
+                bat.style.setProperty('--endX', endX);
+                bat.style.setProperty('--endY', endY);
+                bat.style.setProperty('--rot', rot);
+
+                bat.style.animation = `flyAcross 2.5s forwards ease-in-out`;
+                container.appendChild(bat);
+            }, i * 60);
+        }
+    } else if (type === 'star') {
+        for(let i=0; i<25; i++) {
+            const s = document.createElement('div');
+            s.className = 'gogh-star';
+            s.innerHTML = '✦';
+            s.style.left = Math.random() * 100 + "vw";
+            s.style.top = Math.random() * 100 + "vh";
+            s.style.animationDelay = (Math.random() * 1) + "s";
+            container.appendChild(s);
+        }
+    } else if (type === 'pink') {
+        for(let i=0; i<20; i++) {
+            setTimeout(() => {
+                const p = document.createElement('div');
+                p.className = 'kitty-pop';
+                p.style.width = '150px'; p.style.height = '150px';
+                p.style.left = Math.random() * 100 + "vw";
+                p.style.top = Math.random() * 100 + "vh";
+                container.appendChild(p);
+            }, i * 50);
+        }
+    }
+    // Tempo aumentado para 2.5s para transição completa
+    setTimeout(callback, 2500); 
+}
+
 function entrar() {
-    let senha = document.getElementById("senha").value.toLowerCase().trim();
+    let senha = inputSenha.value.toLowerCase().trim();
     const msg = document.getElementById("mensagem");
-    const box = document.querySelector('.login-box');
 
     box.classList.remove('shake');
+    msg.style.color = "#ff0040"; 
 
-    if (senha === "goth") {
-        // Redireciona para a página principal
-        window.location.href = "portal.html";
-    } 
-    else if (senha === "hellokitty" || senha === "hello") { 
-        window.location.href = "https://void2p.github.io/Portal/";
+    function acerto(url, texto, particleColor, transitionType) {
+        msg.style.color = particleColor;
+        if(texto) msg.innerText = texto;
+
+        if(url) {
+            document.body.style.background = "black";
+            box.classList.add('exit-portal');
+            triggerSpecialTransition(transitionType, () => {
+                window.location.href = url;
+            });
+        } else {
+            box.style.borderColor = particleColor;
+            box.style.boxShadow = `0 0 30px ${particleColor}`;
+            setTimeout(() => { 
+                box.style.borderColor = ""; 
+                box.style.boxShadow = ""; 
+            }, 2500);
+        }
     }
-    else if (senha === "primeiro") {
-        window.location.href = "Burton.html";
-    } 
-    else if (senha === "amo você") { // Ajustado para evitar conflito com a senha 'goth'
-        window.location.href = "Amo você.html";
-    } 
-    else if (senha === "nenem") {
-        msg.innerText = "Eu te amo MUUUIITOO.";
-    } 
-    else if (senha === "papai") {
-        msg.innerText = "QUE LINDAAA VOSE ACERTOU";
-    } 
-    else if (senha === "segredo") {
-        msg.innerText = "Nossa, viu nos códigos ou eu não aguentei e te falei?";
-    }
-    else if (senha === "codeina") {
-        msg.innerText = "A dona do meu coração e do meu ser.";
-    }
-    else if (senha === "escatologia filmes") {
-        window.location.href = "https://escatologiafilmes.com";
-    }
-    else if (senha === "larga a mão") {
-        msg.innerText = "Larga a mão que você escreveu larga a mão kkkkkk";
-    }
-    else if (senha === "infinito") {
-        msg.innerText = "Nosso tempo não tem ponteiros, apenas o sempre.";
-    }
-    else if (senha === "kaneki" || senha === "paulo") {
-        msg.innerText = "Por favor né, eu i ele";
-    }
-    else if (senha === "tubarão te amo") {
-        msg.innerText = "TCHUBARAAAWWWWW";
-    }
+
+    if (senha === "goth") acerto("portal.html", "O portal das sombras se abre...", "#ffffff", "bat");
+    else if (senha === "gogh") acerto("https://2p666.github.io/gogh/index.html", "Pintando nossa história...", "#f1c40f", "star");
+    else if (senha === "hellokitty" || senha === "hello") acerto("https://void2p.github.io/Portal/", "Tudo rosa por aqui!", "#ffc9da", "pink");
+    else if (senha === "primeiro") acerto("Burton.html", "O estranho mundo...", "#a11228", "bat");
+    else if (senha === "amo você") acerto("Amo você.html", "Eu te amo mais", "#ff4d4d", "pink");
+    else if (senha === "nenem") acerto(null, "Eu te amo MUUUIITOO.", "#0080ff");
+    else if (senha === "papai") acerto(null, "QUE LINDAAA VOSE ACERTOU", "#0080ff");
+    else if (senha === "segredo") acerto(null, "Gênia", "#0080ff");
+    else if (senha === "codeina") acerto(null, "Dona do meu ser.", "#0080ff");
+    else if (senha === "escatologia filmes") acerto("https://escatologiafilmes.com", "Redirecionando...", "#ffffff", "bat");
+    else if (senha === "larga a mão") acerto(null, "KKKKKKK larga a mão que você escreveu larga a mão", "#0080ff");
+    else if (senha === "infinito") acerto(null, "Nosso tempo é eterno.", "#0080ff");
+    else if (senha === "kaneki" || senha === "paulo") acerto(null, "Eu i ele sempre.", "#0080ff");
+    else if (senha === "tubarão te amo") acerto(null, "TCHUBARAAAWWWWW", "#0080ff");
+    else if (senha === "") msg.innerText = "Digite a chave.";
     else {
-        // Erro
+        erros++;
         void box.offsetWidth; 
         box.classList.add('shake');
-        msg.innerText = "Senha errada.";
+        msg.innerText = erros >= 3 ? "Dica: É o artista da Noite Estrelada..." : "Senha Incorreta.";
     }
 }
-    
 </script>
-
 </body>
 </html>
