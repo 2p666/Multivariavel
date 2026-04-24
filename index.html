@@ -111,6 +111,7 @@ button:hover { background: #a11228; color: black; box-shadow: 0 0 15px #a11228; 
 .state-goth { border-color: #ffffff !important; box-shadow: 0 0 40px rgba(255, 255, 255, 0.4) !important; color: #fff !important; }
 .state-hello { border-color: #ffc9da !important; box-shadow: 0 0 40px rgba(255, 201, 218, 0.4) !important; color: #ffc9da !important; }
 .state-blood { border-color: #ff0000 !important; box-shadow: 0 0 40px rgba(255, 0, 0, 0.5) !important; color: #ff0000 !important; }
+.state-quero { border-color: #0080ff !important; box-shadow: 0 0 40px rgba(0, 128, 255, 0.4) !important; color: #0080ff !important; }
 
 /* TRANSIÇÕES LENTAS */
 .transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2000; overflow: hidden; }
@@ -251,7 +252,7 @@ let erros = 0;
 /* FEEDBACK DINÂMICO + CURSORES */
 inputSenha.addEventListener("input", (e) => {
     const val = e.target.value.toLowerCase().trim();
-    box.classList.remove('state-gogh', 'state-goth', 'state-hello', 'state-blood');
+    box.classList.remove('state-gogh', 'state-goth', 'state-hello', 'state-blood', 'state-quero');
     body.classList.remove('cursor-gogh', 'cursor-goth', 'cursor-hello', 'cursor-blood');
     
     if(val.includes("gogh")) {
@@ -266,6 +267,8 @@ inputSenha.addEventListener("input", (e) => {
     } else if(val.includes("escatologia")) {
         box.classList.add('state-blood');
         body.classList.add('cursor-blood');
+    } else if(val.includes("quero vose")) {
+        box.classList.add('state-quero');
     }
 });
 
@@ -371,9 +374,13 @@ function entrar() {
         if(url) {
             document.body.style.background = "black";
             box.classList.add('exit-portal');
-            triggerSpecialTransition(transitionType, () => {
-                window.location.href = url;
-            });
+            if(transitionType) {
+                triggerSpecialTransition(transitionType, () => {
+                    window.location.href = url;
+                });
+            } else {
+                setTimeout(() => { window.location.href = url; }, 1000);
+            }
         } else {
             box.style.borderColor = particleColor;
             box.style.boxShadow = `0 0 30px ${particleColor}`;
@@ -389,6 +396,7 @@ function entrar() {
     else if (senha === "hellokitty" || senha === "hello") acerto("https://void2p.github.io/Portal/", "Hello Kitty!!!", "#ffc9da", "pink");
     else if (senha === "primeiro") acerto("Burton.html", "O primeiro de vários", "#a11228", "bat");
     else if (senha === "amo você") acerto("Amo você.html", "Eu te amo mais", "#ff4d4d", "pink");
+    else if (senha === "quero vose") acerto("QueroVose.html", "Contando os segundos...", "#0080ff");
     else if (senha === "nenem") acerto(null, "Eu te amo MUUUIITOO.", "#0080ff");
     else if (senha === "papai") acerto(null, "QUE LINDAAA VOSE ACERTOU", "#0080ff");
     else if (senha === "segredo") acerto(null, "Gênia", "#0080ff");
