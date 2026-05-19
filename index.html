@@ -256,7 +256,13 @@ let erros = 0;
 let metamorfoseDisparada = false;
 let faseDoisLiberada = false;
 
+// CORREÇÃO: Força o estado original da página ao retornar via setinha do navegador
 window.addEventListener("pageshow", (event) => {
+    // Reseta o input e remove classes de estado que poderiam travar a interface
+    inputSenha.value = "";
+    box.classList.remove('exit-portal');
+    box.style.display = 'block';
+    
     if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
         desfazerMetamorfose();
     }
