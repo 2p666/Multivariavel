@@ -27,7 +27,7 @@ body::before {
 
 body {
     height: 100vh;
-    background: url("img/goth.png") no-repeat center center fixed;
+    background: url("img/Login.jpg") no-repeat center center fixed;
     background-size: cover; 
     display: flex;
     justify-content: center;
@@ -242,8 +242,8 @@ body.metamorfose-ativa { background-size: cover !important; }
 </div>
 
 <script>
-const SENHA_SECRETA_GOTICA = "sempre"; 
-const URL_DESTINO_GOTICO   = "PORTAL_DO_GITHUB_AQUI.html"; 
+const SENHA_SECRETA_GOTICA = "relicario"; 
+const URL_DESTINO_GOTICO   = "https://2p666.github.io/Vitoriano/"; 
 const CAMINHO_IMAGEM_CRUZ    = "img/Cruz.png"; 
 const IMAGEM_FUNDO_METAMORFOSE = "img/Skull.png";
 const IMAGEM_MOLDURA_GOTICA    = "img/moldura.png"; 
@@ -387,7 +387,7 @@ function desfazerMetamorfose() {
 
 function dispararSaidaPortal() {
     box.classList.add('exit-portal');
-    triggerSpecialTransition(() => { window.location.href = "https://2p666.github.io/Vitoriano/"; });
+    triggerSpecialTransition(() => { window.location.href = URL_DESTINO_GOTICO; });
 }
 
 function triggerSpecialTransition(callback) {
@@ -469,7 +469,7 @@ function entrar() {
         void box.offsetWidth; 
         box.classList.add('shake');
         msg.style.color = "#ff0000";
-        msg.innerText = erros >= 3 ? "Dica: Só dia 01/07" : "Senha Incorreta.";
+        msg.innerText = erros >= 3 ? "Dica: Só dia 01/06" : "Senha Incorreta.";
     }
 }
 </script>
