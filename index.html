@@ -1,477 +1,815 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acesso</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Multivariável</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=IM+Fell+English:ital@0;1&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ==============================================================
+       MULTIVARIÁVEL — CONTADOR DO REINO
+       Tudo que você precisa trocar está concentrado em CONFIG, no JS.
+       Não há SVG nem imagens externas: use somente seus arquivos em img/.
+       ============================================================== */
 
-<link rel="icon" type="img/png" href="img/p.png">
-<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel&family=Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+    :root {
+      --accent: #bfc2c7;
+      --accent-rgb: 191, 194, 199;
+      --accent-soft: #f1f1f1;
+      --ink: #121416;
+      --panel: rgba(18, 19, 21, .76);
+      --moon-glow: rgba(225, 225, 225, .25);
+    }
 
-<style>
-*, *::before, *::after {
-    margin: 0; padding: 0; box-sizing: border-box;
-}
+    * { box-sizing: border-box; }
 
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: url('https://www.transparenttextures.com/patterns/stardust.png');
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: 1000;
-    transition: opacity 3s ease;
-}
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #05090e;
+      color: #f5fbff;
+    }
 
-body {
-    height: 100vh;
-    background: url("img/goth.png") no-repeat center center fixed;
-    background-size: cover; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'IM Fell English SC', serif;
-    overflow: hidden;
-    background-color: black;
-    transition: background 1s cubic-bezier(0.25, 1, 0.5, 1), cursor 0.3s ease;
-}
+    body {
+      font-family: 'IM Fell English', Georgia, serif;
+      user-select: none;
+    }
 
-body.cursor-gogh { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px'><text y='24'>🖌️</text></svg>"), auto; }
-body.cursor-goth { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px'><text y='24'>⚰️</text></svg>"), auto; }
-body.cursor-hello { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px'><text y='24'>🎀</text></svg>"), auto; }
-body.cursor-blood { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px'><text y='24'>🔪</text></svg>"), auto; }
+    #scene,
+    .layer {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
 
-.particle {
-    position: absolute;
-    pointer-events: none;
-    transition: opacity 1s ease, transform 1s ease;
-}
+    #scene {
+      isolation: isolate;
+      background-color: var(--ink);
+      background-image: var(--background-image);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      transition: background-image 1.2s ease, filter 1.2s ease, background-position .25s ease;
+    }
 
-.star-style {
-    width: 2px; height: 2px;
-    border-radius: 50%;
-    animation: moveUp linear infinite, twinkle 2s ease-in-out infinite alternate;
-}
+    #scene::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: var(--scene-overlay,
+        linear-gradient(135deg, rgba(3, 10, 23, .68), rgba(var(--accent-rgb), .07) 46%, rgba(0, 0, 0, .78)),
+        radial-gradient(circle at 72% 21%, var(--moon-glow), transparent 27%));
+      mix-blend-mode: multiply;
+      transition: background 1.2s ease;
+    }
 
-.ember-style {
-    width: var(--size);
-    height: var(--size);
-    background: radial-gradient(circle, rgba(230,70,20,0.9) 0%, rgba(50,10,5,0.4) 80%);
-    border-radius: 30% 70% 70% 30% / 30% 40% 60% 70%;
-    box-shadow: 0 0 8px rgba(255,80,20,0.6), 0 0 15px rgba(255,40,0,0.3);
-    filter: blur(0.5px);
-    animation: moveUp linear infinite, emberSway 3s ease-in-out infinite alternate;
-}
+    #scene.awake { filter: saturate(1.11) brightness(1.06); }
 
-@keyframes moveUp {
-    from { transform: translateY(105vh) translateX(0); }
-    to { transform: translateY(-10vh) translateX(var(--drift)); }
-}
+    #moon-image,
+    #cemiterio-image,
+    #moldura-image {
+      position: absolute;
+      display: none;
+      pointer-events: none;
+      object-fit: contain;
+      -webkit-user-drag: none;
+      user-select: none;
+    }
 
-@keyframes twinkle {
-    0% { opacity: 0.2; transform: scale(0.8); }
-    100% { opacity: 0.8; transform: scale(1.2); }
-}
+    #moon-image {
+      z-index: 3;
+      width: min(31vw, 330px);
+      right: 10vw;
+      top: 7vh;
+      pointer-events: auto;
+      cursor: pointer;
+      filter: drop-shadow(0 0 37px var(--moon-glow));
+      animation: moonBreathe 6s ease-in-out infinite;
+      transition: filter 1.1s ease, scale 1.1s ease;
+    }
 
-@keyframes emberSway {
-    0% { margin-left: 0px; rotate: 0deg; }
-    100% { margin-left: 25px; rotate: 45deg; opacity: 0.4; }
-}
+    #scene.awake #moon-image {
+      scale: 1.055;
+      filter: drop-shadow(0 0 67px var(--moon-glow));
+    }
 
-.login-box {
-    width: 320px;
-    padding: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 25px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    text-align: center;
-    color: #ffb3c6;
-    z-index: 10;
-    position: relative;
-    transition: transform 0.1s ease-out, box-shadow 1s ease-in-out, border-color 1s ease-in-out, color 1s ease-in-out, background 1s ease-in-out, border-radius 1s ease-in-out, border-width 0.3s ease, width 0.5s ease;
-}
+    #cemiterio-image {
+      z-index: 6;
+      width: min(53vw, 620px);
+      height: auto;
+      left: -1.5vw;
+      bottom: -2vh;
+      opacity: .9;
+      filter: drop-shadow(0 9px 14px rgba(0, 0, 0, .75)) brightness(.8) contrast(1.06);
+      animation: graveyardBreath 11s ease-in-out infinite;
+    }
 
-input {
-    width: 85%;
-    padding: 12px;
-    margin-top: 20px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid #7a1e2d;
-    border-radius: 8px;
-    color: #ffb3c6;
-    text-align: center;
-    outline: none;
-    transition: all 0.5s ease;
-}
+    #mist {
+      z-index: 8;
+      pointer-events: none;
+      opacity: .73;
+      background:
+        radial-gradient(ellipse at 18% 82%, rgba(214, 228, 230, .2), transparent 42%),
+        radial-gradient(ellipse at 70% 72%, rgba(var(--accent-rgb), .13), transparent 49%),
+        linear-gradient(0deg, rgba(211, 226, 229, .15), transparent 42%);
+      filter: blur(13px);
+      transform: scale(1.14);
+      animation: mistDrift 16s ease-in-out infinite alternate;
+      transition: opacity 1.2s ease, filter 1.2s ease;
+    }
 
-button {
-    margin-top: 25px;
-    padding: 10px 25px;
-    background: transparent;
-    border: 1px solid #a11228;
-    color: #a11228;
-    cursor: inherit;
-    font-family: 'Cinzel', serif;
-    border-radius: 20px;
-    transition: all 0.5s ease;
-}
+    #scene.awake #mist { opacity: 1; filter: blur(17px) brightness(1.14); }
+    #bat-layer { z-index: 10; pointer-events: none; }
+    #shooting-star-layer { z-index: 11; pointer-events: none; }
+    #theme-stage { z-index: 12; pointer-events: none; }
+    #spark-layer { z-index: 17; pointer-events: none; }
 
-button:hover { background: #a11228; color: black; box-shadow: 0 0 15px #a11228; }
+    #moldura-image {
+      z-index: 19;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+    }
 
-#mensagem { margin-top: 15px; font-weight: bold; min-height: 20px; transition: color 0.4s; }
+    #vignette {
+      z-index: 20;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 50%, transparent 31%, rgba(0, 0, 0, .17) 66%, rgba(0, 0, 0, .76) 100%);
+    }
 
-.state-gogh { border-color: #f1c40f !important; box-shadow: 0 0 40px rgba(241, 196, 15, 0.4) !important; color: #f1c40f !important; }
-.state-goth { border-color: #ffffff !important; box-shadow: 0 0 40px rgba(255, 255, 255, 0.4) !important; color: #fff !important; }
-.state-hello { border-color: #ffc9da !important; box-shadow: 0 0 40px rgba(255, 201, 218, 0.4) !important; color: #ffc9da !important; }
-.state-blood { border-color: #ff0000 !important; box-shadow: 0 0 40px rgba(255, 0, 0, 0.5) !important; color: #ff0000 !important; }
-.state-quero { border-color: #0080ff !important; box-shadow: 0 0 40px rgba(0, 128, 255, 0.4) !important; color: #0080ff !important; }
+    .bat {
+      position: absolute;
+      width: var(--bat-size);
+      left: -20vw;
+      top: var(--bat-top);
+      opacity: 0;
+      transform-origin: center;
+      filter: drop-shadow(0 0 5px rgba(0, 0, 0, .78));
+      animation: batFlight var(--bat-duration) linear var(--bat-delay) forwards;
+    }
 
-.metamorfose-impacto { animation: quickFlop 0.35s cubic-bezier(0.215, 0.610, 0.355, 1) forwards; }
+    .bat.reverse {
+      left: auto;
+      right: -20vw;
+      transform: scaleX(-1);
+      animation-name: batFlightReverse;
+    }
 
-@keyframes quickFlop {
-    0% { transform: scale(1); filter: brightness(1); }
-    30% { transform: scale(1.04); filter: brightness(1.8) blur(1px); }
-    100% { transform: scale(1); filter: brightness(1); }
-}
+    .shooting-star {
+      position: absolute;
+      left: -30vw;
+      top: var(--star-top);
+      width: var(--star-size);
+      opacity: 0;
+      filter: drop-shadow(0 0 4px rgba(247, 220, 132, .2));
+      animation: shootingStar 1.25s cubic-bezier(.1, .52, .2, 1) forwards;
+    }
 
-body.metamorfose-ativa { background-size: cover !important; }
+    .star-tip {
+      position: absolute;
+      right: 2%;
+      bottom: 7%;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 233, 160, .78);
+      box-shadow: 0 0 10px 2px rgba(255, 214, 100, .38);
+      animation: tipPulse .45s ease-in-out infinite alternate;
+    }
 
-.login-box.metamorfose-caixa {
-    width: 380px;
-    background: rgba(0, 0, 0, 0.4) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-radius: 0px !important;
-    color: #dfba73 !important;
-    border-width: 45px !important;
-    border-style: solid !important;
-    border-image-slice: 65 fill !important;
-    box-shadow: 0 40px 90px rgba(0, 0, 0, 1), inset 0 0 45px rgba(122, 30, 45, 0.3), 0 0 60px rgba(223, 186, 115, 0.2) !important;
-}
+    .spark {
+      position: absolute;
+      width: var(--spark-size);
+      height: var(--spark-size);
+      left: var(--spark-x);
+      top: var(--spark-y);
+      border-radius: 50%;
+      background: rgba(222, 240, 248, .95);
+      box-shadow: 0 0 12px 3px rgba(var(--accent-rgb), .7);
+      animation: sparkRise var(--spark-duration) ease-out forwards;
+    }
 
-.metamorfose-caixa input {
-    background: rgba(0, 0, 0, 0.85) !important;
-    border: 1px solid #dfba73 !important;
-    color: #fff !important;
-    font-family: 'Cinzel', serif;
-    letter-spacing: 5px;
-    box-shadow: inset 0 0 15px rgba(122, 30, 45, 0.7) !important;
-}
+    .stage-asset {
+      position: absolute;
+      width: var(--asset-width);
+      left: var(--asset-left);
+      top: var(--asset-top);
+      opacity: 0;
+      object-fit: cover;
+      border: var(--asset-border, 0);
+      border-radius: var(--asset-radius, 0);
+      box-shadow: var(--asset-shadow, none);
+      filter: var(--asset-filter, none);
+      transform: rotate(var(--asset-rotate)) scale(.87);
+      animation: assetArrive .85s cubic-bezier(.2,.8,.2,1) forwards, assetFloat var(--asset-float) ease-in-out .9s infinite alternate;
+    }
 
-.metamorfose-caixa button {
-    border: 1px solid #dfba73 !important;
-    color: #dfba73 !important;
-    background: rgba(20, 2, 3, 0.9) !important;
-    font-weight: bold;
-    letter-spacing: 3px;
-    border-radius: 0px !important;
-}
-.metamorfose-caixa button:hover {
-    background: #dfba73 !important;
-    color: #050101 !important;
-    box-shadow: 0 0 25px #dfba73 !important;
-}
+    /* ===================== CONTADOR ===================== */
+    main {
+      position: relative;
+      z-index: 16;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      pointer-events: none;
+    }
 
-.transition-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2000; overflow: hidden; }
-.final-color-fill { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2100; opacity: 0; pointer-events: none; animation: finalFillFade 1.5s forwards; animation-delay: 2.5s; }
+    .portal-panel {
+      width: min(720px, 100%);
+      padding: 40px 34px 30px;
+      text-align: center;
+      pointer-events: auto;
+      border: 1px solid rgba(var(--accent-rgb), .58);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(5, 15, 30, .8), var(--panel));
+      box-shadow: inset 0 0 42px rgba(var(--accent-rgb), .13), 0 0 60px rgba(var(--accent-rgb), .24), 0 28px 65px rgba(0, 0, 0, .45);
+      backdrop-filter: blur(12px);
+      transition: border-color .8s ease, background .8s ease, box-shadow .8s ease, transform .7s ease;
+    }
 
-@keyframes finalFillFade { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .portal-panel.previewing { transform: scale(1.018); }
+    .overline { margin: 0 0 13px; color: var(--accent-soft); font: 10px 'Share Tech Mono', monospace; letter-spacing: 4px; text-transform: uppercase; }
+    h1 { margin: 0; font: 600 clamp(28px, 5.7vw, 55px) Cinzel, serif; letter-spacing: 1.5px; text-shadow: 0 0 22px rgba(var(--accent-rgb), .45); }
+    .subtitle { margin: 14px auto 26px; max-width: 520px; color: rgba(240, 249, 255, .85); font-size: 17px; line-height: 1.5; }
 
-.cross-img {
-    position: absolute;
-    width: var(--w);
-    height: auto;
-    filter: drop-shadow(0 0 15px rgba(0,0,0,0.95)) drop-shadow(0 0 5px rgba(223,186,115,0.4));
-    z-index: 2002;
-    opacity: 0;
-}
+    .counter-box { position: relative; padding: 22px 12px 14px; border-top: 1px solid rgba(var(--accent-rgb), .23); border-bottom: 1px solid rgba(var(--accent-rgb), .23); }
+    .counter-status { min-height: 18px; margin: 0 0 15px; color: var(--accent-soft); font: 10px 'Share Tech Mono', monospace; letter-spacing: 2px; text-transform: uppercase; }
+    .slots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .slot { min-width: 0; padding: 10px 4px 8px; border: 1px solid rgba(var(--accent-rgb), .26); border-radius: 10px; background: rgba(1, 7, 18, .45); cursor: pointer; transition: transform .22s, border-color .22s, background .22s, box-shadow .22s; }
+    .slot:hover, .slot.editing { transform: translateY(-4px); border-color: var(--accent); background: rgba(var(--accent-rgb), .13); box-shadow: 0 0 20px rgba(var(--accent-rgb), .25); }
+    .slot-value { display: block; min-height: 34px; font: 500 clamp(20px, 3.2vw, 32px) 'Share Tech Mono', monospace; color: white; text-shadow: 0 0 15px rgba(var(--accent-rgb), .85); }
+    .slot-name { display: block; margin-top: 4px; color: var(--accent-soft); font: 8px 'Share Tech Mono', monospace; letter-spacing: 1.15px; text-transform: uppercase; }
+    .slot-input { display: none; width: 100%; min-height: 34px; border: 0; outline: 0; border-radius: 6px; text-align: center; color: #fff; background: rgba(255,255,255,.13); font: 500 clamp(20px, 3.2vw, 32px) 'Share Tech Mono', monospace; }
+    .slot.editing .slot-value { display: none; }
+    .slot.editing .slot-input { display: block; }
 
-@keyframes flyCrossImage {
-    0% { transform: translate(var(--startX), var(--startY)) scale(0.4) rotate(var(--rotStart)); opacity: 0; }
-    15% { opacity: 1; }
-    85% { opacity: 1; }
-    100% { transform: translate(var(--endX), var(--endY)) scale(1.4) rotate(var(--rotEnd)); opacity: 0; }
-}
+    .selected-date { min-height: 22px; margin: 17px 0 0; color: rgba(237, 247, 255, .87); font-size: 15px; font-style: italic; }
+    .selected-theme { min-height: 18px; margin: 5px 0 0; color: var(--accent-soft); font: 9px 'Share Tech Mono', monospace; letter-spacing: 1.8px; text-transform: uppercase; }
+    .actions { display: flex; justify-content: center; gap: 10px; min-height: 45px; margin-top: 22px; }
+    button.action { border: 1px solid rgba(var(--accent-rgb), .75); border-radius: 999px; padding: 11px 18px; color: #fff; cursor: pointer; background: linear-gradient(110deg, rgba(var(--accent-rgb), .86), rgba(255,255,255,.14)); box-shadow: 0 0 25px rgba(var(--accent-rgb), .28); font: 10px 'Share Tech Mono', monospace; letter-spacing: 1.6px; text-transform: uppercase; transition: transform .22s, filter .22s; }
+    button.action:hover { transform: translateY(-3px); filter: brightness(1.15); }
+    button.action.secondary { background: rgba(3, 13, 26, .58); box-shadow: none; }
+    button.hidden { display: none; }
 
-.mist {
-    position: absolute;
-    width: 200vw; height: 200vh;
-    background: radial-gradient(circle, rgba(10, 1, 1, 0.99) 0%, transparent 85%);
-    z-index: 2001;
-    opacity: 0;
-    animation: riseMist 4s forwards ease-in-out;
-}
+    #gate {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(var(--accent-rgb), .9), rgba(0, 0, 0, .98) 70%);
+      transition: opacity .9s ease, visibility .9s ease;
+    }
+    #gate.open { opacity: 1; visibility: visible; }
+    .gate-ring { width: min(48vw, 410px); aspect-ratio: 1; border: 1px solid rgba(255,255,255,.8); border-radius: 50%; box-shadow: 0 0 70px 20px rgba(var(--accent-rgb), .52), inset 0 0 55px rgba(var(--accent-rgb), .55); animation: gateOpen 1.9s ease-in-out infinite alternate; }
 
-@keyframes riseMist {
-    0% { transform: translateY(80vh); opacity: 0; }
-    100% { transform: translateY(-30vh); opacity: 1; }
-}
+    @keyframes batFlight { 0% { opacity:0; translate:0 0; rotate:-8deg; } 8% { opacity:var(--bat-opacity); } 37% { translate:43vw var(--bat-arc); rotate:8deg; } 68% { translate:82vw calc(var(--bat-arc) * -.36); rotate:-4deg; } 91% { opacity:var(--bat-opacity); } 100% { opacity:0; translate:125vw var(--bat-end); rotate:6deg; } }
+    @keyframes batFlightReverse { 0% { opacity:0; translate:0 0; rotate:-8deg; } 8% { opacity:var(--bat-opacity); } 37% { translate:-43vw var(--bat-arc); rotate:8deg; } 68% { translate:-82vw calc(var(--bat-arc) * -.36); rotate:-4deg; } 91% { opacity:var(--bat-opacity); } 100% { opacity:0; translate:-125vw var(--bat-end); rotate:6deg; } }
+    @keyframes moonBreathe { 50% { transform: scale(1.018); } }
+    @keyframes graveyardBreath { 50% { transform: translateY(-3px); filter: drop-shadow(0 12px 17px rgba(0,0,0,.78)) brightness(.88) contrast(1.08); } }
+    @keyframes mistDrift { to { transform:scale(1.18) translateX(2.5%) translateY(-1.5%); opacity:.96; } }
+    @keyframes shootingStar { 0%{opacity:0;translate:0 0;rotate:18deg}8%{opacity:.9}75%{opacity:.8}100%{opacity:0;translate:145vw 48vh;rotate:18deg} }
+    @keyframes tipPulse { to { opacity:.5; scale:.72; } }
+    @keyframes sparkRise { 0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--spark-drift)),-150px) scale(.1)} }
+    @keyframes assetArrive { to { opacity:var(--asset-opacity); transform:rotate(var(--asset-rotate)) scale(1); } }
+    @keyframes assetFloat { to { translate:var(--asset-drift) -13px; } }
+    @keyframes gateOpen { to { scale:1.18; filter:brightness(1.4); } }
 
-.exit-portal { 
-    opacity: 0 !important; 
-    transform: scale(0.55) perspective(1000px) rotateX(-25deg) translateY(-60px) !important; 
-    pointer-events: none; 
-    transition: all 2s cubic-bezier(0.6, -0.28, 0.735, 0.045) !important; 
-}
-
-.shake { animation: shake 0.5s; border-color: #ff0000 !important; }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-</style>
+    @media (max-width: 700px) {
+      main { padding: 14px; }
+      .portal-panel { padding: 30px 15px 22px; border-radius: 22px; }
+      .subtitle { font-size: 15px; margin-bottom: 20px; }
+      .slots { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+      #moon-image { width: 44vw; right: 2vw; top: 8vh; }
+      #cemiterio-image { width: 92vw; left: -12vw; bottom: -1vh; }
+      .stage-asset { width: min(var(--asset-width), 34vw); }
+    }
+  </style>
 </head>
-
 <body>
+  <div id="scene" data-theme="reino">
+    <img id="moon-image" alt="">
+    <img id="cemiterio-image" alt="">
+    <div class="layer" id="mist"></div>
+    <div class="layer" id="bat-layer"></div>
+    <div class="layer" id="shooting-star-layer"></div>
+    <div class="layer" id="theme-stage"></div>
+    <div class="layer" id="spark-layer"></div>
+    <img id="moldura-image" alt="">
+    <div class="layer" id="vignette"></div>
+  </div>
 
-<div class="login-box" id="loginBox">
-    <h2 id="tituloPortal" style="font-family: 'Pirata One', cursive; font-size: 2.5rem; margin-bottom: 0; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);">Nosso Portal</h2>
-    <p id="subtituloPortal" style="opacity: 0.7; transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);">Somente nós dois.</p>
+  <main>
+    <section class="portal-panel" id="portalPanel">
+      <div class="counter-box">
+        <p class="counter-status" id="counterStatus"></p>
+        <div class="slots" id="slots"></div>
+        <p class="selected-date" id="selectedDate"></p>
+        <p class="selected-theme" id="selectedTheme"></p>
+      </div>
 
-    <input type="password" id="senha" placeholder="Senha" autocomplete="off">
-    <br>
-    <button onclick="entrar()" id="btnEntrar">Entrar</button>
+      <div class="actions">
+        <button class="action hidden" id="openButton" type="button">Abrir esta porta</button>
+        <button class="action secondary hidden" id="nowButton" type="button">Voltar ao presente</button>
+      </div>
+    </section>
+  </main>
 
-    <audio id="musicaFundo" loop>
-        <source src="music/dark.mp3" type="audio/mpeg">
-    </audio>
+  <div id="gate" aria-hidden="true"><div class="gate-ring"></div></div>
 
-    <p id="mensagem"></p>
-</div>
+  <script>
+    /* ==============================================================
+       CONFIGURAÇÃO
+       Cada "ambiente" é um mundo separado. Troque SOMENTE os caminhos,
+       posições e cores abaixo. Não precisa mexer no restante do código.
 
-<script>
-const SENHA_SECRETA_GOTICA = "relicario"; 
-const URL_DESTINO_GOTICO   = "https://2p666.github.io/Vitoriano/"; 
-const CAMINHO_IMAGEM_CRUZ    = "img/Cruz.png"; 
-const IMAGEM_FUNDO_METAMORFOSE = "img/Skull.png";
-const IMAGEM_MOLDURA_GOTICA    = "img/moldura.png"; 
-
-const inputSenha = document.getElementById("senha");
-const box = document.getElementById("loginBox");
-const body = document.body;
-const musica = document.getElementById("musicaFundo");
-let erros = 0;
-let metamorfoseDisparada = false;
-let faseDoisLiberada = false;
-
-// CORREÇÃO: Força o estado original da página ao retornar via setinha do navegador
-window.addEventListener("pageshow", (event) => {
-    // Reseta o input e remove classes de estado que poderiam travar a interface
-    inputSenha.value = "";
-    box.classList.remove('exit-portal');
-    box.style.display = 'block';
-    
-    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-        desfazerMetamorfose();
-    }
-});
-
-function recriarParticulas(tipo) {
-    document.querySelectorAll('.particle').forEach(p => p.remove());
-    for(let i=0; i<55; i++){ 
-        let p = document.createElement("div");
-        p.className = "particle";
-        p.style.left = Math.random() * 100 + "%";
-        p.style.top = Math.random() * 100 + "vh";
-        if (tipo === 'brasas') {
-            p.classList.add('ember-style');
-            const size = (Math.random() * 5 + 2) + "px";
-            p.style.setProperty('--size', size);
-            p.style.setProperty('--drift', (Math.random() * 80 - 40) + "px");
-            p.style.animationDuration = (Math.random() * 4 + 3) + "s";
-        } else {
-            p.classList.add('star-style');
-            p.style.background = Math.random() > 0.5 ? "#a11228" : "#0080ff";
-            p.style.animationDuration = (Math.random() * 10 + 8) + "s";
+       assets: imagens decorativas transparentes (PNG é o ideal).
+       left/top/width: posição e tamanho de cada imagem na tela.
+       hide: esconde elementos do reino-base quando aquele tema abre.
+       ============================================================== */
+    const CONFIG = {
+      inicioRelacionamento: '2025-07-01T00:00:00-03:00',
+      // UMA imagem para o fundo do site enquanto o contador está no presente.
+      // Coloque o arquivo na pasta img/ e troque o caminho abaixo.
+      fundoGeral: 'img/fundo-geral.jpg',
+      reino: {
+        background: 'img/back.JPG', // usado apenas se fundoGeral ficar vazio
+        lua: 'img/moon.png',
+        cemiterio: 'img/a-removebg-preview.png',
+        moldura: '',
+        morcegos: ['img/cego.png', 'img/mor.png'],
+        estrelaCadente: 'img/estrela-cadente.png',
+        ambiente: {
+          accent: '#bfc2c7', rgb: '191, 194, 199', soft: '#f1f1f1',
+          panel: 'linear-gradient(145deg, rgba(18,19,21,.86), rgba(45,47,51,.56))',
+          overlay: 'linear-gradient(135deg, rgba(8,9,10,.78), rgba(210,210,210,.05) 50%, rgba(0,0,0,.86))',
+          hide: [], assets: []
         }
-        p.style.animationDelay = (Math.random() * 4) + "s";
-        document.body.appendChild(p);
-    }
-}
-
-recriarParticulas('estrelas');
-
-inputSenha.addEventListener("input", (e) => {
-    const val = e.target.value.toLowerCase().trim();
-    if(val === SENHA_SECRETA_GOTICA) {
-        if(!metamorfoseDisparada) {
-            metamorfoseDisparada = true;
-            executarMetamorfoseCompleta();
+      },
+      destinos: [
+        {
+          id: 'primeiro', nome: 'O primeiro de vários',
+          inicio: '2025-07-01T00:00:00-03:00', fim: '2025-12-31T23:59:59-03:00',
+          url: 'Burton.html',
+          ambiente: {
+            background: 'img/primeiro-fundo.jfif',
+            accent: '#b63947', rgb: '182, 57, 71', soft: '#ffd7dc',
+            panel: 'linear-gradient(135deg, rgba(26, 9, 12, .88), rgba(62, 17, 22, .68))',
+            overlay: 'linear-gradient(90deg, rgba(0,0,0,.83), rgba(115,18,31,.18), rgba(0,0,0,.8))',
+            hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
+            imagens: ['img/primeiro-01.png', 'img/primeiro-02.png'],
+            assets: [
+              { src: 'img/primeiro-esquerda.png', left: '3vw', top: '8vh', width: '24vw', rotate: '-5deg', opacity: .82 },
+              { src: 'img/primeiro-direita.png', left: '76vw', top: '48vh', width: '20vw', rotate: '4deg', opacity: .76 }
+            ]
+          }
+        },
+        {
+          id: 'seis', nome: 'Seis meses',
+          inicio: '2026-01-01T00:00:00-03:00', fim: '2026-03-18T23:59:59-03:00',
+          url: 'https://2p666.github.io/Sixmonts/',
+          ambiente: {
+            background: 'img/seis-fundo.png',
+            accent: '#ff5c6c', rgb: '255, 92, 108', soft: '#ffe0e3',
+            panel: 'linear-gradient(145deg, rgba(45,9,17,.82), rgba(94,19,33,.57))',
+            overlay: 'radial-gradient(circle at 50% 48%, rgba(255,95,125,.18), transparent 37%), linear-gradient(180deg, rgba(24,3,10,.62), rgba(0,0,0,.76))',
+            hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
+            imagens: ['img/seis-01.png', 'img/seis-02.png'],
+            assets: [
+              { src: 'img/seis-carta.png', left: '7vw', top: '13vh', width: '21vw', rotate: '-7deg', opacity: .9 },
+              { src: 'img/seis-flor.png', left: '73vw', top: '14vh', width: '18vw', rotate: '5deg', opacity: .85 }
+            ]
+          }
+        },
+        {
+          id: 'hello', nome: 'Hello Kitty',
+          inicio: '2026-03-19T00:00:00-03:00', fim: '2026-04-02T23:59:59-03:00',
+          url: 'https://2p666.github.io/Hello/',
+          ambiente: {
+            background: 'img/groundKitty.jfif',
+            accent: '#ff8fbe', rgb: '255, 143, 190', soft: '#ffe1ee',
+            panel: 'linear-gradient(145deg, rgba(255,244,250,.86), rgba(255,161,203,.47))',
+            overlay: 'linear-gradient(135deg, rgba(255,229,241,.42), rgba(255,112,174,.14), rgba(250,191,218,.38))',
+            hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
+            imagens: ['img/hello-01.png', 'img/hello-02.png', 'img/hello-03.png', 'img/hello-04.png'],
+            assets: [
+              { src: 'img/hello-canto-01.png', left: '2vw', top: '7vh', width: '22vw', rotate: '-8deg', opacity: .96 },
+              { src: 'img/hello-canto-02.png', left: '77vw', top: '8vh', width: '19vw', rotate: '8deg', opacity: .95 },
+              { src: 'img/hello-canto-03.png', left: '4vw', top: '66vh', width: '18vw', rotate: '5deg', opacity: .91 },
+              { src: 'img/hello-canto-04.png', left: '78vw', top: '65vh', width: '17vw', rotate: '-4deg', opacity: .91 }
+            ]
+          }
+        },
+        {
+          id: 'goth', nome: 'O Portal das Sombras',
+          inicio: '2026-04-03T00:00:00-03:00', fim: '2026-05-08T23:59:59-03:00',
+          url: 'https://2p666.github.io/goth/',
+          ambiente: {
+            background: 'img/gothGround.jfif',
+            accent: '#eee9ff', rgb: '238, 233, 255', soft: '#ffffff',
+            panel: 'linear-gradient(145deg, rgba(7,5,14,.91), rgba(33,19,47,.72))',
+            overlay: 'linear-gradient(120deg, rgba(0,0,0,.86), rgba(194,135,255,.10), rgba(0,0,0,.82))',
+            hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
+            imagens: ['img/g1.png', 'img/g2.png', 'img/g3.png'],
+            assets: [
+              { src: 'img/goth-ornamento-esquerda.png', left: '0', top: '0', width: '27vw', rotate: '0deg', opacity: .84 },
+              { src: 'img/goth-ornamento-direita.png', left: '73vw', top: '0', width: '27vw', rotate: '0deg', opacity: .84 },
+              { src: 'img/goth-cruz.png', left: '45vw', top: '70vh', width: '10vw', rotate: '0deg', opacity: .78 }
+            ]
+          }
+        },
+        {
+          id: 'gogh', nome: 'Noite Estrelada',
+          inicio: '2026-05-09T00:00:00-03:00', fim: null,
+          url: 'https://2p666.github.io/gogh/index.html',
+          ambiente: {
+            background: 'img/gogh-fundo.jpg',
+            accent: '#f0c547', rgb: '240, 197, 71', soft: '#fff0ac',
+            panel: 'linear-gradient(145deg, rgba(3,15,54,.87), rgba(9,48,112,.61))',
+            overlay: 'radial-gradient(circle at 80% 17%, rgba(245,195,61,.35), transparent 15%), linear-gradient(160deg, rgba(1,9,42,.4), rgba(3,8,32,.70))',
+            hide: ['cemiterio', 'bats'],
+            imagens: ['img/gogh-01.png', 'img/gogh-02.png', 'img/gogh-03.png'],
+            assets: [
+              { src: 'img/gogh-quadro-01.png', left: '4vw', top: '16vh', width: '18vw', rotate: '-7deg', opacity: .93 },
+              { src: 'img/gogh-quadro-02.png', left: '78vw', top: '52vh', width: '17vw', rotate: '5deg', opacity: .93 },
+              { src: 'img/gogh-girassol.png', left: '76vw', top: '9vh', width: '14vw', rotate: '8deg', opacity: .9 }
+            ]
+          }
         }
-        return;
-    }
-    if(metamorfoseDisparada && val !== SENHA_SECRETA_GOTICA) {
-        desfazerMetamorfose();
-        return;
-    }
-    box.classList.remove('state-gogh', 'state-goth', 'state-hello', 'state-blood', 'state-quero');
-    body.classList.remove('cursor-gogh', 'cursor-goth', 'cursor-hello', 'cursor-blood');
-    if(val.includes("gogh")) { box.classList.add('state-gogh'); body.classList.add('cursor-gogh'); } 
-    else if(val.includes("goth")) { box.classList.add('state-goth'); body.classList.add('cursor-goth'); } 
-    else if(val.includes("hello") || val.includes("kitty")) { box.classList.add('state-hello'); body.classList.add('cursor-hello'); } 
-    else if(val.includes("escatologia")) { box.classList.add('state-blood'); body.classList.add('cursor-blood'); } 
-    else if(val.includes("quero vose")) { box.classList.add('state-quero'); }
-});
-
-document.addEventListener('mousemove', (e) => {
-    if(box.classList.contains('exit-portal') || box.classList.contains('metamorfose-impacto')) {
-        box.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
-        return;
-    }
-    const x = e.clientX; const y = e.clientY;
-    const rect = box.getBoundingClientRect();
-    const boxCenterX = rect.left + rect.width / 2;
-    const boxCenterY = rect.top + rect.height / 2;
-    const rotateX = (boxCenterY - y) / 25; const rotateY = (x - boxCenterX) / 25;
-    box.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-});
-
-inputSenha.addEventListener("keypress", (e) => { 
-    if(e.key === "Enter") {
-        if(faseDoisLiberada) dispararSaidaPortal();
-        else entrar(); 
-    }
-});
-
-function executarMetamorfoseCompleta() {
-    musica.play().catch(e => console.log("Áudio aguardando interação."));
-    const msg = document.getElementById("mensagem");
-    const titulo = document.getElementById("tituloPortal");
-    const subtitulo = document.getElementById("subtituloPortal");
-    box.classList.add('metamorfose-impacto');
-    box.style.borderImageSource = `url("${IMAGEM_MOLDURA_GOTICA}")`;
-    body.style.background = `linear-gradient(135deg, rgba(10, 0, 1, 0.99) 0%, rgba(32, 1, 4, 0.95) 45%, rgba(0, 0, 0, 1) 100%), url("${IMAGEM_FUNDO_METAMORFOSE}") no-repeat center center fixed`;
-    body.classList.add('metamorfose-ativa');
-    box.classList.add('metamorfose-caixa');
-    body.classList.remove('cursor-gogh', 'cursor-goth', 'cursor-hello', 'cursor-blood');
-    body.classList.add('cursor-goth');
-    recriarParticulas('brasas');
-    msg.style.color = "#dfba73";
-    msg.innerText = "Para sempre";
-    titulo.style.fontFamily = "'Cinzel Decorative', serif";
-    titulo.innerText = "Codein";
-    titulo.style.textShadow = "0 0 20px rgba(223, 186, 115, 0.6)";
-    subtitulo.innerText = "1 ANO";
-    subtitulo.style.color = "#dfba73";
-    subtitulo.style.opacity = "0.9";
-    faseDoisLiberada = true; 
-    setTimeout(() => { box.classList.remove('metamorfose-impacto'); }, 400);
-}
-
-function desfazerMetamorfose() {
-    musica.pause();
-    musica.currentTime = 0;
-    metamorfoseDisparada = false;
-    faseDoisLiberada = false;
-    box.classList.remove('metamorfose-impacto');
-    box.style.borderImageSource = "none";
-    box.style.borderWidth = "";
-    body.style.background = ""; 
-    body.classList.remove('metamorfose-ativa');
-    box.classList.remove('metamorfose-caixa');
-    body.classList.remove('cursor-goth');
-    recriarParticulas('estrelas');
-    const titulo = document.getElementById("tituloPortal");
-    const subtitulo = document.getElementById("subtituloPortal");
-    const msg = document.getElementById("mensagem");
-    titulo.style.fontFamily = "'Pirata One', cursive";
-    titulo.innerText = "Nosso Portal";
-    titulo.style.textShadow = "none";
-    subtitulo.innerText = "Somente nós dois.";
-    subtitulo.style.color = "";
-    subtitulo.style.opacity = "0.7";
-    msg.innerText = "";
-}
-
-function dispararSaidaPortal() {
-    box.classList.add('exit-portal');
-    triggerSpecialTransition(() => { window.location.href = URL_DESTINO_GOTICO; });
-}
-
-function triggerSpecialTransition(callback) {
-    const container = document.createElement('div');
-    container.className = 'transition-overlay';
-    document.body.appendChild(container);
-    const colorFill = document.createElement('div');
-    colorFill.className = 'final-color-fill';
-    colorFill.style.backgroundColor = "#030001"; 
-    document.body.appendChild(colorFill);
-    const mist = document.createElement('div');
-    mist.className = 'mist';
-    container.appendChild(mist);
-    for(let i=0; i<15; i++) {
-        setTimeout(() => {
-            if(!box.classList.contains('exit-portal')) return;
-            const img = document.createElement('img');
-            img.src = CAMINHO_IMAGEM_CRUZ;
-            img.className = 'cross-img';
-            const width = Math.floor(Math.random() * 40 + 50) + "px";
-            const startX = Math.random() * 90 + "vw";
-            const startY = "110vh";
-            const endX = (Math.random() * 120 - 10) + "vw";
-            const endY = "-30vh";
-            const rotStart = Math.random() * 40 - 20;
-            const rotEnd = rotStart + (Math.random() * 60 - 30);
-            img.style.setProperty('--w', width);
-            img.style.setProperty('--startX', startX);
-            img.style.setProperty('--startY', startY);
-            img.style.setProperty('--endX', endX);
-            img.style.setProperty('--endY', endY);
-            img.style.setProperty('--rotStart', rotStart + 'deg');
-            img.style.setProperty('--rotEnd', rotEnd + 'deg');
-            img.style.animation = `flyCrossImage 4s forwards ease-in-out`;
-            container.appendChild(img);
-        }, i * 180);
-    }
-    setTimeout(callback, 4000); 
-}
-
-function entrar() {
-    if (faseDoisLiberada) { dispararSaidaPortal(); return; }
-    if (metamorfoseDisparada) return; 
-    let senha = inputSenha.value.toLowerCase().trim();
-    const msg = document.getElementById("mensagem");
-    box.classList.remove('shake');
-    function acerto(url, texto, particleColor, usarTransicao) {
-        msg.style.color = particleColor;
-        if(texto) msg.innerText = texto;
-        if(url) {
-            document.body.style.background = "black";
-            box.classList.add('exit-portal');
-            if(usarTransicao) { triggerSpecialTransition(() => { window.location.href = url; }); } 
-            else { setTimeout(() => { window.location.href = url; }, 1000); }
-        } else {
-            box.style.borderColor = particleColor;
-            box.style.boxShadow = `0 0 30px ${particleColor}`;
-            setTimeout(() => { box.style.borderColor = ""; box.style.boxShadow = ""; }, 3000);
+      ],
+      segredo666: {
+        nome: 'O horror se aproxima', url: 'https://escatologiafilmes.com',
+        ambiente: {
+          background: 'img/saló.webp', accent: '#e63a3a', rgb: '230, 58, 58', soft: '#ffd2d2',
+          panel: 'linear-gradient(145deg, rgba(21,0,0,.91), rgba(88,0,0,.62))',
+          overlay: 'radial-gradient(circle at 50% 50%, rgba(207,0,0,.20), rgba(0,0,0,.9) 67%)',
+          hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
+          imagens: ['img/666-0.png', 'img/666-02.png'],
+          assets: [
+            { src: 'img/666-01.png', left: '8vw', top: '13vh', width: '21vw', rotate: '-5deg', opacity: .83 },
+            { src: 'img/666-02.jfif', left: '73vw', top: '13vh', width: '21vw', rotate: '5deg', opacity: .83 }
+          ]
         }
+      }
+    };
+
+    const UNIDADES = [
+      { chave: 'anos', nome: 'Anos', min: 0, max: 99 },
+      { chave: 'meses', nome: 'Meses', min: 0, max: 11 },
+      { chave: 'dias', nome: 'Dias', min: 0, max: 31 },
+      { chave: 'horas', nome: 'Horas', min: 0, max: 23 },
+      { chave: 'minutos', nome: 'Min', min: 0, max: 59 },
+      { chave: 'segundos', nome: 'Seg', min: 0, max: 59 }
+    ];
+
+    const inicio = new Date(CONFIG.inicioRelacionamento);
+    const scene = document.getElementById('scene');
+    const slots = document.getElementById('slots');
+    const counterStatus = document.getElementById('counterStatus');
+    const selectedDate = document.getElementById('selectedDate');
+    const selectedTheme = document.getElementById('selectedTheme');
+    const portalPanel = document.getElementById('portalPanel');
+    const openButton = document.getElementById('openButton');
+    const nowButton = document.getElementById('nowButton');
+    const moonImage = document.getElementById('moon-image');
+    const cemeteryImage = document.getElementById('cemiterio-image');
+    const frameImage = document.getElementById('moldura-image');
+    const batLayer = document.getElementById('bat-layer');
+    const starLayer = document.getElementById('shooting-star-layer');
+    const sparkLayer = document.getElementById('spark-layer');
+    const themeStage = document.getElementById('theme-stage');
+    const gate = document.getElementById('gate');
+
+    let editando = false;
+    let intervaloContador = null;
+    let temaAtual = null;
+
+    function aleatorio(minimo, maximo) { return Math.random() * (maximo - minimo) + minimo; }
+    function inteiro(minimo, maximo) { return Math.floor(aleatorio(minimo, maximo + 1)); }
+    function preencher(numero) { return String(numero).padStart(2, '0'); }
+
+    function usarImagem(elemento, caminho) {
+      if (!caminho) return;
+      elemento.src = caminho;
+      elemento.style.display = 'block';
     }
-    if (senha === "goth") acerto("https://2p666.github.io/goth/", "O portal das sombras se abre...", "#ffffff", true);
-    else if (senha === "gogh") acerto("https://2p666.github.io/gogh/index.html", "Pintando nossa história...", "#f1c40f");
-    else if (senha === "hellokitty" || senha === "hello") acerto("https://2p666.github.io/Hello/", "Hello Kitty!!!", "#ffc9da");
-    else if (senha === "primeiro") acerto("Burton.html", "O primeiro de vários", "#a11228", true);
-    else if (senha === "amo você") acerto("https://2p666.github.io/Sixmonts/", "Eu te amo mais", "#ff4d4d");
-    else if (senha === "quero vose") acerto("https://2p666.github.io/Contador./", "Contando os segundos...", "#0080ff");
-    else if (senha === "nenem") acerto(null, "Eu te amo MUUUIITOO.", "#0080ff");
-    else if (senha === "papai") acerto(null, "QUE LINDAAA VOSE ACERTOU", "#0080ff");
-    else if (senha === "segredo") acerto(null, "Gênia", "#0080ff");
-    else if (senha === "codeina") acerto(null, "Dona do meu ser.", "#0080ff");
-    else if (senha === "escatologia filmes") acerto("https://escatologiafilmes.com", "O horror se aproxima...", "#ff0000");
-    else if (senha === "larga a mão") acerto(null, "KKKKKKK larga a mão que você escreveu larga a mão", "#0080ff");
-    else if (senha === "infinito") acerto(null, "Nosso tempo é eterno.", "#0080ff");
-    else if (senha === "kaneki" || senha === "paulo") acerto(null, "Eu i ele né", "#0080ff");
-    else if (senha === "tubarão te amo") acerto(null, "TCHUBARAAAWWWWW", "#0080ff");
-    else if (senha === "") msg.innerText = "Digite a chave.";
-    else {
-        erros++;
-        void box.offsetWidth; 
-        box.classList.add('shake');
-        msg.style.color = "#ff0000";
-        msg.innerText = erros >= 3 ? "Dica: Só dia 01/06" : "Senha Incorreta.";
+
+    function diferencaCalendario(inicioData, fimData) {
+      const alvo = new Date(fimData);
+      const cursor = new Date(inicioData);
+      const resultado = {};
+
+      resultado.anos = alvo.getFullYear() - cursor.getFullYear();
+      cursor.setFullYear(cursor.getFullYear() + resultado.anos);
+      if (cursor > alvo) { resultado.anos--; cursor.setFullYear(cursor.getFullYear() - 1); }
+
+      resultado.meses = (alvo.getFullYear() - cursor.getFullYear()) * 12 + alvo.getMonth() - cursor.getMonth();
+      cursor.setMonth(cursor.getMonth() + resultado.meses);
+      if (cursor > alvo) { resultado.meses--; cursor.setMonth(cursor.getMonth() - 1); }
+
+      let restante = alvo - cursor;
+      resultado.dias = Math.floor(restante / 86400000);
+      cursor.setDate(cursor.getDate() + resultado.dias);
+      restante = alvo - cursor;
+      resultado.horas = Math.floor(restante / 3600000);
+      restante %= 3600000;
+      resultado.minutos = Math.floor(restante / 60000);
+      restante %= 60000;
+      resultado.segundos = Math.floor(restante / 1000);
+      return resultado;
     }
-}
-</script>
+
+    function dataDaDuracao(valores) {
+      const data = new Date(inicio);
+      data.setFullYear(data.getFullYear() + valores.anos);
+      data.setMonth(data.getMonth() + valores.meses);
+      data.setDate(data.getDate() + valores.dias);
+      data.setHours(data.getHours() + valores.horas);
+      data.setMinutes(data.getMinutes() + valores.minutos);
+      data.setSeconds(data.getSeconds() + valores.segundos);
+      return data;
+    }
+
+    function dataBonita(data) {
+      return new Intl.DateTimeFormat('pt-BR', {
+        dateStyle: 'full', timeStyle: 'short', timeZone: 'America/Sao_Paulo'
+      }).format(data);
+    }
+
+    function montarSlots(valores) {
+      slots.innerHTML = '';
+      UNIDADES.forEach(unidade => {
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+        slot.dataset.chave = unidade.chave;
+        slot.innerHTML = `
+          <span class="slot-value">${preencher(valores[unidade.chave] || 0)}</span>
+          <input class="slot-input" type="number" min="${unidade.min}" max="${unidade.max}" value="${valores[unidade.chave] || 0}" aria-label="${unidade.nome}">
+          <span class="slot-name">${unidade.nome}</span>`;
+        slot.addEventListener('click', () => editarSlot(slot));
+        const input = slot.querySelector('input');
+        input.addEventListener('click', evento => evento.stopPropagation());
+        input.addEventListener('input', atualizarManual);
+        input.addEventListener('blur', () => slot.classList.remove('editing'));
+        slots.appendChild(slot);
+      });
+    }
+
+    function valoresDosSlots() {
+      const valores = {};
+      UNIDADES.forEach(unidade => {
+        const input = document.querySelector(`[data-chave="${unidade.chave}"] .slot-input`);
+        const numero = Number(input.value);
+        valores[unidade.chave] = Math.max(unidade.min, Math.min(unidade.max, Number.isFinite(numero) ? numero : 0));
+      });
+      return valores;
+    }
+
+    function atualizarSlots(valores) {
+      UNIDADES.forEach(unidade => {
+        const slot = document.querySelector(`[data-chave="${unidade.chave}"]`);
+        if (!slot) return;
+        slot.querySelector('.slot-value').textContent = preencher(valores[unidade.chave] || 0);
+        slot.querySelector('.slot-input').value = valores[unidade.chave] || 0;
+      });
+    }
+
+    function editarSlot(slot) {
+      if (!editando) {
+        editando = true;
+        clearInterval(intervaloContador);
+        counterStatus.textContent = '';
+        openButton.classList.remove('hidden');
+        nowButton.classList.remove('hidden');
+        atualizarManual();
+      }
+      slot.classList.add('editing');
+      const input = slot.querySelector('input');
+      input.focus();
+      input.select();
+    }
+
+    function destinoPara(data, valores) {
+      if (valores.meses === 6 && valores.dias === 6 && valores.horas === 6) return CONFIG.segredo666;
+      return CONFIG.destinos.find(destino => data >= new Date(destino.inicio) && (!destino.fim || data <= new Date(destino.fim))) || null;
+    }
+
+    function aplicarTema(destino) {
+      const chave = destino?.id || 'reino';
+      if (temaAtual === chave) return;
+      temaAtual = chave;
+      const tema = destino ? destino.ambiente : CONFIG.reino.ambiente;
+      const esconder = new Set(tema.hide || []);
+
+      scene.dataset.theme = chave;
+      scene.style.setProperty('--accent', tema.accent);
+      scene.style.setProperty('--accent-rgb', tema.rgb);
+      scene.style.setProperty('--accent-soft', tema.soft);
+      scene.style.setProperty('--moon-glow', `rgba(${tema.rgb}, .43)`);
+      scene.style.setProperty('--background-image', `url("${tema.background || CONFIG.fundoGeral || CONFIG.reino.background}")`);
+      scene.style.setProperty('--scene-overlay', tema.overlay || 'none');
+      portalPanel.style.background = tema.panel;
+      portalPanel.style.color = tema.soft;
+      portalPanel.classList.toggle('previewing', Boolean(destino));
+      moonImage.style.display = esconder.has('moon') ? 'none' : (CONFIG.reino.lua ? 'block' : 'none');
+      cemeteryImage.style.display = esconder.has('cemiterio') ? 'none' : (CONFIG.reino.cemiterio ? 'block' : 'none');
+      document.getElementById('mist').style.display = esconder.has('mist') ? 'none' : 'block';
+      batLayer.style.display = esconder.has('bats') ? 'none' : 'block';
+      starLayer.style.display = esconder.has('star') ? 'none' : 'block';
+      mostrarCenario(tema.assets || [], tema.imagens || []);
+    }
+
+    function mostrarCenario(assets, imagens) {
+      themeStage.innerHTML = '';
+      const posicoesAutomaticas = [
+        { left: '4vw', top: '9vh', width: '18vw', rotate: '-6deg' },
+        { left: '78vw', top: '10vh', width: '17vw', rotate: '6deg' },
+        { left: '5vw', top: '68vh', width: '16vw', rotate: '4deg' },
+        { left: '80vw', top: '66vh', width: '15vw', rotate: '-4deg' }
+      ];
+      const automaticos = imagens.filter(Boolean).slice(0, 4).map((src, indice) => ({
+        src, ...posicoesAutomaticas[indice], opacity: .94,
+        border: '1px solid rgba(255,255,255,.42)',
+        shadow: '0 10px 28px rgba(0,0,0,.32)'
+      }));
+      [...automaticos, ...assets].filter(asset => asset.src).forEach((asset, indice) => {
+        const imagem = document.createElement('img');
+        imagem.className = 'stage-asset';
+        imagem.src = asset.src;
+        imagem.alt = '';
+        imagem.style.setProperty('--asset-left', asset.left || '0');
+        imagem.style.setProperty('--asset-top', asset.top || '0');
+        imagem.style.setProperty('--asset-width', asset.width || '180px');
+        imagem.style.setProperty('--asset-rotate', asset.rotate || '0deg');
+        imagem.style.setProperty('--asset-opacity', asset.opacity ?? .85);
+        imagem.style.setProperty('--asset-drift', asset.drift || (indice % 2 ? '-9px' : '9px'));
+        imagem.style.setProperty('--asset-float', asset.float || `${4.5 + indice * .4}s`);
+        imagem.style.setProperty('--asset-filter', asset.filter || 'none');
+        imagem.style.setProperty('--asset-shadow', asset.shadow || 'none');
+        imagem.style.setProperty('--asset-border', asset.border || '0');
+        imagem.style.setProperty('--asset-radius', asset.radius || '0');
+        imagem.addEventListener('error', () => imagem.remove());
+        themeStage.appendChild(imagem);
+      });
+    }
+
+    function atualizarManual() {
+      const valores = valoresDosSlots();
+      atualizarSlots(valores);
+      const data = dataDaDuracao(valores);
+      const destino = destinoPara(data, valores);
+      selectedDate.textContent = `Esta porta leva para: ${dataBonita(data)}.`;
+
+      if (destino) {
+        selectedTheme.textContent = `O reino agora veste a memória: ${destino.nome}.`;
+        aplicarTema(destino);
+      } else {
+        selectedTheme.textContent = data > new Date() ? 'Esse instante ainda não chegou.' : 'Ainda não existe uma porta criada para esta parte da história.';
+        aplicarTema(null);
+      }
+    }
+
+    function atualizarContadorVivo() {
+      if (editando) return;
+      atualizarSlots(diferencaCalendario(inicio, new Date()));
+    }
+
+    function voltarAoPresente() {
+      editando = false;
+      counterStatus.textContent = '';
+      selectedDate.textContent = '';
+      selectedTheme.textContent = '';
+      openButton.classList.add('hidden');
+      nowButton.classList.add('hidden');
+      document.querySelectorAll('.slot').forEach(slot => slot.classList.remove('editing'));
+      aplicarTema(null);
+      atualizarContadorVivo();
+      intervaloContador = setInterval(atualizarContadorVivo, 1000);
+    }
+
+    function abrirDestino() {
+      const valores = valoresDosSlots();
+      const data = dataDaDuracao(valores);
+      const destino = destinoPara(data, valores);
+      if (!destino || data > new Date()) return;
+      scene.style.setProperty('--accent-rgb', destino.rgb);
+      gate.classList.add('open');
+      setTimeout(() => { window.location.href = destino.url; }, 1300);
+    }
+
+    function criarBando() {
+      const imagens = CONFIG.reino.morcegos.filter(Boolean);
+      if (!imagens.length) return;
+      const quantidade = inteiro(4, 8);
+      const reverso = Math.random() > .5;
+      for (let i = 0; i < quantidade; i++) {
+        const morcego = document.createElement('img');
+        morcego.className = `bat${reverso ? ' reverse' : ''}`;
+        morcego.src = imagens[i % imagens.length];
+        morcego.alt = '';
+        morcego.style.setProperty('--bat-size', `${aleatorio(34, 105)}px`);
+        morcego.style.setProperty('--bat-top', `${aleatorio(7, 63)}vh`);
+        morcego.style.setProperty('--bat-duration', `${aleatorio(2.2, 4.2)}s`);
+        morcego.style.setProperty('--bat-delay', `${i * aleatorio(.16, .35)}s`);
+        morcego.style.setProperty('--bat-arc', `${aleatorio(-90, 90)}px`);
+        morcego.style.setProperty('--bat-end', `${aleatorio(-44, 44)}px`);
+        morcego.style.setProperty('--bat-opacity', aleatorio(.5, .96));
+        morcego.addEventListener('animationend', () => morcego.remove());
+        batLayer.appendChild(morcego);
+      }
+    }
+
+    function programarBandos() {
+      setTimeout(() => { criarBando(); programarBandos(); }, inteiro(10000, 15000));
+    }
+
+    function criarEstrelaCadente() {
+      if (!CONFIG.reino.estrelaCadente) return;
+      const estrela = document.createElement('div');
+      estrela.className = 'shooting-star';
+      estrela.style.setProperty('--star-top', `${aleatorio(5, 29)}vh`);
+      estrela.style.setProperty('--star-size', `${aleatorio(74, 155)}px`);
+      const imagem = document.createElement('img');
+      imagem.src = CONFIG.reino.estrelaCadente;
+      imagem.alt = '';
+      imagem.style.cssText = 'width:100%;display:block';
+      const ponta = document.createElement('i');
+      ponta.className = 'star-tip';
+      estrela.append(imagem, ponta);
+      estrela.addEventListener('animationend', () => estrela.remove());
+      starLayer.appendChild(estrela);
+    }
+
+    function programarEstrelas() { setTimeout(() => { criarEstrelaCadente(); programarEstrelas(); }, 30000); }
+
+    function criarBrilhos(x, y, quantidade) {
+      for (let i = 0; i < quantidade; i++) {
+        const brilho = document.createElement('i');
+        brilho.className = 'spark';
+        brilho.style.setProperty('--spark-x', `${x}px`);
+        brilho.style.setProperty('--spark-y', `${y}px`);
+        brilho.style.setProperty('--spark-size', `${aleatorio(1, 4)}px`);
+        brilho.style.setProperty('--spark-duration', `${aleatorio(1.2, 2.6)}s`);
+        brilho.style.setProperty('--spark-drift', `${aleatorio(-125, 125)}px`);
+        brilho.addEventListener('animationend', () => brilho.remove());
+        sparkLayer.appendChild(brilho);
+      }
+    }
+
+    function alternarLua(evento) {
+      evento.stopPropagation();
+      const acordado = scene.classList.contains('awake');
+      scene.classList.toggle('awake');
+      const lua = moonImage.getBoundingClientRect();
+      criarBrilhos(lua.left + lua.width / 2, lua.top + lua.height / 2, acordado ? 16 : 46);
+      if (!acordado) criarBando();
+    }
+
+    function parallax(evento) {
+      const x = (evento.clientX / window.innerWidth - .5) * 8;
+      const y = (evento.clientY / window.innerHeight - .5) * 8;
+      scene.style.backgroundPosition = `calc(50% + ${x}px) calc(50% + ${y}px)`;
+      moonImage.style.translate = `${x * -.6}px ${y * -.45}px`;
+    }
+
+    function iniciarCenario() {
+      scene.style.setProperty('--background-image', `url("${CONFIG.fundoGeral || CONFIG.reino.background}")`);
+      usarImagem(moonImage, CONFIG.reino.lua);
+      usarImagem(cemeteryImage, CONFIG.reino.cemiterio);
+      usarImagem(frameImage, CONFIG.reino.moldura);
+      aplicarTema(null);
+      setTimeout(criarBando, 1800);
+      setTimeout(criarEstrelaCadente, 7000);
+      programarBandos();
+      programarEstrelas();
+    }
+
+    montarSlots(diferencaCalendario(inicio, new Date()));
+    iniciarCenario();
+    atualizarContadorVivo();
+    intervaloContador = setInterval(atualizarContadorVivo, 1000);
+
+    openButton.addEventListener('click', abrirDestino);
+    nowButton.addEventListener('click', voltarAoPresente);
+    moonImage.addEventListener('pointerdown', alternarLua);
+    window.addEventListener('pointermove', parallax);
+    document.addEventListener('keydown', evento => {
+      if (evento.key === 'Enter' && editando) {
+        evento.preventDefault();
+        abrirDestino();
+      }
+    });
+  </script>
 </body>
 </html>
