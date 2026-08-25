@@ -223,6 +223,7 @@
     }
 
     .portal-panel {
+      position: relative;
       width: min(720px, 100%);
       padding: 40px 34px 30px;
       text-align: center;
@@ -234,6 +235,19 @@
       backdrop-filter: blur(12px);
       transition: border-color .8s ease, background .8s ease, box-shadow .8s ease, transform .7s ease;
     }
+
+    #contador-moldura {
+      position: absolute;
+      inset: -8px;
+      z-index: 3;
+      display: none;
+      width: calc(100% + 16px);
+      height: calc(100% + 16px);
+      object-fit: fill;
+      pointer-events: none;
+    }
+
+    .portal-panel > :not(#contador-moldura) { position: relative; z-index: 4; }
 
     .portal-panel.previewing { transform: scale(1.018); }
     .overline { margin: 0 0 13px; color: var(--accent-soft); font: 10px 'Share Tech Mono', monospace; letter-spacing: 4px; text-transform: uppercase; }
@@ -312,6 +326,7 @@
 
   <main>
     <section class="portal-panel" id="portalPanel">
+      <img id="contador-moldura" alt="">
       <div class="counter-box">
         <p class="counter-status" id="counterStatus"></p>
         <div class="slots" id="slots"></div>
@@ -354,6 +369,7 @@
           accent: '#bfc2c7', rgb: '191, 194, 199', soft: '#f1f1f1',
           panel: 'linear-gradient(145deg, rgba(18,19,21,.86), rgba(45,47,51,.56))',
           overlay: 'linear-gradient(135deg, rgba(8,9,10,.78), rgba(210,210,210,.05) 50%, rgba(0,0,0,.86))',
+          molduraContador: 'img/goth.png',
           hide: [], assets: []
         }
       },
@@ -366,6 +382,7 @@
             background: 'img/primeiro-fundo.jfif',
             accent: '#b63947', rgb: '182, 57, 71', soft: '#ffd7dc',
             panel: 'linear-gradient(135deg, rgba(26, 9, 12, .88), rgba(62, 17, 22, .68))',
+            molduraContador: 'img/b.png',
             overlay: 'linear-gradient(90deg, rgba(0,0,0,.83), rgba(115,18,31,.18), rgba(0,0,0,.8))',
             hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
             imagens: ['img/primeiro-01.png', 'img/primeiro-02.png'],
@@ -383,6 +400,7 @@
             background: 'img/seis-fundo.png',
             accent: '#ff5c6c', rgb: '255, 92, 108', soft: '#ffe0e3',
             panel: 'linear-gradient(145deg, rgba(45,9,17,.82), rgba(94,19,33,.57))',
+            molduraContador: 'img/moldP.png',
             overlay: 'radial-gradient(circle at 50% 48%, rgba(255,95,125,.18), transparent 37%), linear-gradient(180deg, rgba(24,3,10,.62), rgba(0,0,0,.76))',
             hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
             imagens: ['img/seis-01.png', 'img/seis-02.png'],
@@ -400,6 +418,7 @@
             background: 'img/groundKitty.jfif',
             accent: '#ff8fbe', rgb: '255, 143, 190', soft: '#ffe1ee',
             panel: 'linear-gradient(145deg, rgba(255,244,250,.86), rgba(255,161,203,.47))',
+            molduraContador: 'img/moldH.png',
             overlay: 'linear-gradient(135deg, rgba(255,229,241,.42), rgba(255,112,174,.14), rgba(250,191,218,.38))',
             hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
             imagens: ['img/hello-01.png', 'img/hello-02.png', 'img/hello-03.png', 'img/hello-04.png'],
@@ -419,24 +438,26 @@
             background: 'img/gothGround.jfif',
             accent: '#eee9ff', rgb: '238, 233, 255', soft: '#ffffff',
             panel: 'linear-gradient(145deg, rgba(7,5,14,.91), rgba(33,19,47,.72))',
+            molduraContador: 'img/moldG.png',
             overlay: 'linear-gradient(120deg, rgba(0,0,0,.86), rgba(194,135,255,.10), rgba(0,0,0,.82))',
             hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
-            imagens: ['img/g1.png', 'img/g2.png', 'img/g3.png'],
+            imagens: ['img/g0.png', 'img/.png', 'img/g.png'],
             assets: [
-              { src: 'img/goth-ornamento-esquerda.png', left: '0', top: '0', width: '27vw', rotate: '0deg', opacity: .84 },
-              { src: 'img/goth-ornamento-direita.png', left: '73vw', top: '0', width: '27vw', rotate: '0deg', opacity: .84 },
-              { src: 'img/goth-cruz.png', left: '45vw', top: '70vh', width: '10vw', rotate: '0deg', opacity: .78 }
+              { src: 'img/g1.png', left: '0', top: '0', width: '27vw', rotate: '0deg', opacity: .84 },
+              { src: 'img/g3.png', left: '73vw', top: '0', width: '27vw', rotate: '0deg', opacity: .84 },
+              { src: 'img/g4.png', left: '45vw', top: '70vh', width: '10vw', rotate: '0deg', opacity: .78 }
             ]
           }
         },
         {
           id: 'relicario', nome: 'O Relicário',
-          inicio: '2026-05-08T00:00:00-03:00', fim: '2026-05-08T23:59:59-03:00',
+          inicio: '2026-07-01T00:00:00-03:00', fim: null,
           url: 'https://2p666.github.io/Vitoriano/',
           ambiente: {
             background: 'img/relicario-fundo.jpg',
             accent: '#c9b2e8', rgb: '201, 178, 232', soft: '#f5edff',
             panel: 'linear-gradient(145deg, rgba(13, 7, 23, .90), rgba(58, 33, 79, .70))',
+            molduraContador: 'img/moldG.png',
             overlay: 'radial-gradient(circle at 50% 42%, rgba(181, 123, 255, .17), transparent 34%), linear-gradient(135deg, rgba(0,0,0,.86), rgba(90,44,128,.16), rgba(0,0,0,.86))',
             hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
             imagens: ['img/relicario-01.png', 'img/relicario-02.png', 'img/relicario-03.png', 'img/relicario-04.png'],
@@ -449,12 +470,13 @@
         },
         {
           id: 'gogh', nome: 'Noite Estrelada',
-          inicio: '2026-05-09T00:00:00-03:00', fim: null,
+          inicio: '2026-05-09T00:00:00-03:00', fim: '2026-06-30T23:59:59-03:00',
           url: 'https://2p666.github.io/gogh/index.html',
           ambiente: {
             background: 'img/gogh-fundo.jpg',
             accent: '#f0c547', rgb: '240, 197, 71', soft: '#fff0ac',
             panel: 'linear-gradient(145deg, rgba(3,15,54,.87), rgba(9,48,112,.61))',
+            molduraContador: 'img/moldGo.png',
             overlay: 'radial-gradient(circle at 80% 17%, rgba(245,195,61,.35), transparent 15%), linear-gradient(160deg, rgba(1,9,42,.4), rgba(3,8,32,.70))',
             hide: ['cemiterio', 'bats'],
             imagens: ['img/gogh-01.png', 'img/gogh-02.png', 'img/gogh-03.png'],
@@ -471,6 +493,7 @@
         ambiente: {
           background: 'img/saló.webp', accent: '#e63a3a', rgb: '230, 58, 58', soft: '#ffd2d2',
           panel: 'linear-gradient(145deg, rgba(21,0,0,.91), rgba(88,0,0,.62))',
+          molduraContador: 'img/MoldEs.png',
           overlay: 'radial-gradient(circle at 50% 50%, rgba(207,0,0,.20), rgba(0,0,0,.9) 67%)',
           hide: ['moon', 'cemiterio', 'mist', 'bats', 'star'],
           imagens: ['img/666-0.png', 'img/666-02.png'],
@@ -498,6 +521,7 @@
     const selectedDate = document.getElementById('selectedDate');
     const selectedTheme = document.getElementById('selectedTheme');
     const portalPanel = document.getElementById('portalPanel');
+    const contadorMoldura = document.getElementById('contador-moldura');
     const openButton = document.getElementById('openButton');
     const nowButton = document.getElementById('nowButton');
     const moonImage = document.getElementById('moon-image');
@@ -639,6 +663,13 @@
       scene.style.setProperty('--scene-overlay', tema.overlay || 'none');
       portalPanel.style.background = tema.panel;
       portalPanel.style.color = tema.soft;
+      if (tema.molduraContador) {
+        contadorMoldura.src = tema.molduraContador;
+        contadorMoldura.style.display = 'block';
+      } else {
+        contadorMoldura.removeAttribute('src');
+        contadorMoldura.style.display = 'none';
+      }
       portalPanel.classList.toggle('previewing', Boolean(destino));
       moonImage.style.display = esconder.has('moon') ? 'none' : (CONFIG.reino.lua ? 'block' : 'none');
       cemeteryImage.style.display = esconder.has('cemiterio') ? 'none' : (CONFIG.reino.cemiterio ? 'block' : 'none');
